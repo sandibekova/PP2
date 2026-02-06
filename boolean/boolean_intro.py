@@ -9,4 +9,4 @@ print(light_on)
 
 is_raining = False
 print(is_raining)
-
+ 
