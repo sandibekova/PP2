@@ -1,48 +1,49 @@
-# #️ PP2 PROJECT
+#  PP2 PROJECT
 
 **Source:** W3Schools Python Tutorial  
 
 ---
 
-## Project Overview
-* This repository contains my laboratory works for the **Python Programming II** course.
-* It tracks my progress from basic syntax to **Object-Oriented Programming (OOP)**.
-* Developed using **VS Code** and managed with **Git/GitHub**.
+##  Project Overview
+* This repository is created to practice **basic Python syntax** and **Git workflow**.
+* It follows the structure required for the **W3Schools "Topics to Cover"** assignment.
 
 ---
 
-## Project Structure
+##  Project Structure
 
-### **Practice 1: Python Basics**
-* `hello_world.py`, `variables.py`, `data_types.py`, `strings.py`, `numbers.py`.
-
-### **Practice 2: Control Flow & Logic**
-* **boolean/** — Logical comparisons and truth values.
-* **if_else/** — Conditional branching logic.
-* **loops/** — Iterative processes using `for` and `while`.
-
----
-
-### **Practice 3: Functions & Object-Oriented Programming (OOP)**
-In this section, I implemented modular code and organized data using classes.
-
-#### **1. Functions & Lambda**
-* **functions/** — Defining reusable code blocks, handling arguments, and return values.
-* **lambda/** — Using anonymous functions with `map()`, `filter()`, and `sorted()`.
-
-#### **2. Classes & Inheritance (OOP)**
-* **classes/** — Creating objects with `__init__` methods, class variables, and methods.
-* **inheritance/** — Implementing parent/child class relationships, using `super()`, and method overriding.
+### **1. Practice 1: Python Basics**
+* `hello_world.py` — Basic output examples.
+* `variables.py` — Variable declaration and assignment.
+* `data_types.py` — Demonstration of different Python data types.
+* `strings.py` — String manipulation and methods.
+* `numbers.py` — Working with integers and floats.
 
 ---
 
-##  Technical Implementation
-* **Modular Design**: Code is organized into specific directories for clarity.
-* **Git Workflow**: proficiency in version control, including directory restructuring and modularization.
+### **2. Practice 2: Control Flow & Logic**
+In this section, I implemented more complex logic to make programs dynamic.
+
+#### ** Boolean & Comparison**
+* **`boolean/`** — Learning how to evaluate expressions to `True` or `False`.
+* Using logical operators like `and`, `or`, and `not` to combine conditions.
+
+#### ** Conditionals (If...Else)**
+* **`if_else/`** — Implementing decision-making paths.
+* Using `if`, `elif`, and `else` to handle multiple scenarios in the code.
+
+#### ** Loops & Iteration**
+* **`loops/`** — Automating repetitive tasks with `for` and `while` loops.
+* **Loop Control**: Using `break` to exit a loop and `continue` to skip an iteration.
 
 ---
 
-## How to Save Changes
-1. `git add .`
-2. `git commit -m "feat: add Practice 3 files and update readme"`
-3. `git push origin main`
+##  How to Save Changes to GitHub
+To sync this project with your GitHub account, use these commands in your terminal:
+
+1. **Stage all changes:**
+   * `git add .`
+2. **Commit with a clear message:**
+   * `git commit -m "Add Practice examples"`
+3. **Push to the remote repository:**
+   * `git push origin main`
