@@ -14,8 +14,4 @@ print(type(x))
 print(type(y))
 print(type(z))
 
-x = 6.67
-y = 6.7
-z = -67.67
-
 
