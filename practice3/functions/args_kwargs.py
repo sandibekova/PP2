@@ -1,14 +1,15 @@
-def my_function(*numbers):
-  total = 0
-  for num in numbers:
-    total += num
-  return total
+def my_function(*args):
+  print("Type:", type(args))
+  print("First argument:", args[0])
+  print("Second argument:", args[1])
+  print("All arguments:", args)
 
-print(my_function(1, 2, 3))
-print(my_function(10, 20, 30, 40))
-print(my_function(5))
+my_function("Emil", "Tobias", "Linus")
 
-def mys_function(**kid):
-  print("His last name is " + kid["lname"])
+def mys_function(**myvar):
+  print("Type:", type(myvar))
+  print("Name:", myvar["name"])
+  print("Age:", myvar["age"])
+  print("All data:", myvar)
 
-mys_function(fname = "Tobias", lname = "Refsnes")
+mys_function(name = "Tobias", age = 30, city = "Bergen")
