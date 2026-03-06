@@ -3,7 +3,7 @@ import json
 
 # Load the raw data from the text file
 # Using encoding='utf-8' is essential to read the Cyrillic (Kazakh/Russian) characters correctly.
-with open("raw.txt", "r", encoding="utf-8") as f:
+with open("practice5/raw.txt", "r", encoding="utf-8") as f:
     text = f.read()
 
 # 1. Extract Monetary Values
