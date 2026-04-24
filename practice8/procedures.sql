@@ -1,44 +1,36 @@
--- procedures.sql
-
--- 1. Insert or update a single user
-CREATE OR REPLACE PROCEDURE insert_or_update_user(u_name TEXT, u_surname TEXT, u_phone TEXT)
-LANGUAGE plpgsql
+-- 1. Procedure to Insert or Update
+CREATE OR REPLACE PROCEDURE upsert_user(p_name VARCHAR, p_phone VARCHAR)
 AS $$
 BEGIN
-    IF EXISTS (SELECT 1 FROM phonebook WHERE name = u_name AND surname = u_surname) THEN
-        UPDATE phonebook
-        SET phone = u_phone
-        WHERE name = u_name AND surname = u_surname;
-    ELSE
-        INSERT INTO phonebook (name, surname, phone)
-        VALUES (u_name, u_surname, u_phone);
-    END IF;
+    INSERT INTO contacts (first_name, phone)
+    VALUES (p_name, p_phone)
+    ON CONFLICT (phone) DO UPDATE SET first_name = EXCLUDED.first_name;
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
--- 2. Insert many users with validation
-CREATE OR REPLACE PROCEDURE insert_many_users(users TEXT[][])
-LANGUAGE plpgsql
+-- 2. Procedure to Delete
+CREATE OR REPLACE PROCEDURE delete_contact(p_search VARCHAR)
+AS $$
+BEGIN
+    DELETE FROM contacts 
+    WHERE first_name = p_search OR phone = p_search;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 3. Procedure for Bulk Insert with Loop
+CREATE OR REPLACE PROCEDURE bulk_insert(names TEXT[], phones TEXT[])
 AS $$
 DECLARE
-    user_record TEXT[3];
+    i INT;
 BEGIN
-    FOREACH user_record SLICE 1 IN ARRAY users LOOP
-        IF user_record[3] !~ '^[0-9\-]+$' THEN
-            RAISE NOTICE 'Invalid phone: % for user % %', user_record[3], user_record[1], user_record[2];
+    FOR i IN 1 .. array_upper(names, 1) LOOP
+        IF LENGTH(phones[i]) >= 10 THEN
+            INSERT INTO contacts (first_name, phone) 
+            VALUES (names[i], phones[i])
+            ON CONFLICT (phone) DO NOTHING;
         ELSE
-            CALL insert_or_update_user(user_record[1], user_record[2], user_record[3]);
+            RAISE NOTICE 'Skipping invalid phone: %', phones[i];
         END IF;
     END LOOP;
 END;
-$$;
-
--- 3. Delete contact by name or phone
-CREATE OR REPLACE PROCEDURE delete_contact_by_name_or_phone(u_name TEXT, u_phone TEXT)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    DELETE FROM phonebook
-    WHERE name = u_name OR phone = u_phone;
-END;
-$$;
+$$ LANGUAGE plpgsql;

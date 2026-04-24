@@ -1,80 +1,147 @@
-# phonebook.py
-import csv
-from connect import conn, cur
+from connect import connect
 
-# Insert from CSV
-def insert_from_csv(file_path):
-    with open(file_path, newline='', encoding='utf-8') as csvfile:
-        reader = csv.DictReader(csvfile)
+def insert_from_console():
+    name = input("Enter name: ")
+    phone = input("Enter phone: ")
+
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "INSERT INTO contacts (first_name, phone) VALUES (%s, %s)",
+        (name, phone)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    print("Contact added!")
+
+import csv
+from connect import connect
+
+def insert_from_csv():
+    conn = connect()
+    cur = conn.cursor()
+    
+
+    path = "c:/Users/almas/Desktop/pp/work/practice7/contacts.csv"
+    with open(path, "r") as file:
+        reader = csv.reader(file)
         for row in reader:
             cur.execute(
-                "INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)",
-                (row['name'], row['surname'], row['phone'])
+                "INSERT INTO contacts (first_name, phone) VALUES (%s, %s)",
+                (row[0], row[1])
             )
-    conn.commit()
-    print("CSV data inserted successfully")
 
-# Insert from console
-def insert_from_console():
-    name = input("Enter first name: ")
-    surname = input("Enter surname: ")
-    phone = input("Enter phone number: ")
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    print("CSV data inserted!")
+
+
+def search_by_name(name):
+    conn = connect()
+    cur = conn.cursor()
+
     cur.execute(
-        "INSERT INTO phonebook (name, surname, phone) VALUES (%s, %s, %s)",
-        (name, surname, phone)
+        "SELECT * FROM contacts WHERE first_name = %s",
+        (name,)
     )
-    conn.commit()
-    print("Contact added successfully")
 
-# Update contact
-def update_contact():
-    contact_id = input("Enter contact ID to update: ")
-    field = input("What do you want to update? (name/phone): ")
-    value = input(f"Enter new {field}: ")
-    if field not in ['name', 'phone']:
-        print("Invalid field")
-        return
-    cur.execute(f"UPDATE phonebook SET {field} = %s WHERE id = %s", (value, contact_id))
-    conn.commit()
-    print("Contact updated successfully")
-
-# Search contacts
-def search_contacts():
-    pattern = input("Enter search text: ")
-    cur.execute(
-        "SELECT * FROM phonebook WHERE name ILIKE %s OR surname ILIKE %s OR phone ILIKE %s",
-        (f"%{pattern}%", f"%{pattern}%", f"%{pattern}%")
-    )
     results = cur.fetchall()
     for row in results:
         print(row)
 
-# Delete contact
-def delete_contact():
-    contact_id = input("Enter contact ID to delete: ")
-    cur.execute("DELETE FROM phonebook WHERE id = %s", (contact_id,))
+    cur.close()
+    conn.close()
+
+def search_by_prefix(prefix):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT * FROM contacts WHERE phone LIKE %s",
+        (prefix + "%",)
+    )
+
+    for row in cur.fetchall():
+        print(row)
+
+    cur.close()
+    conn.close()
+
+def update_contact(name, new_phone):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "UPDATE contacts SET phone = %s WHERE first_name = %s",
+        (new_phone, name)
+    )
+
     conn.commit()
-    print("Contact deleted successfully")
+    cur.close()
+    conn.close()
 
-# Menu
-def menu():
-    while True:
-        print("\n1. Insert from CSV\n2. Insert from console\n3. Update contact\n4. Search\n5. Delete\n6. Exit")
-        choice = input("Choose option: ")
-        if choice == '1':
-            insert_from_csv('contacts.csv')
-        elif choice == '2':
-            insert_from_console()
-        elif choice == '3':
-            update_contact()
-        elif choice == '4':
-            search_contacts()
-        elif choice == '5':
-            delete_contact()
-        elif choice == '6':
-            break
-        else:
-            print("Invalid choice")
+    print("Updated!")
 
-if __name__ == "__main__":
-    menu()
+def delete_contact(name):
+    conn = connect()
+    cur = conn.cursor()
+
+    cur.execute(
+        "DELETE FROM contacts WHERE first_name = %s",
+        (name,)
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    print("Deleted!")
+
+def safe_insert(name, phone):
+    conn = connect()
+    cur = conn.cursor()
+
+    try:
+        cur.execute(
+            "INSERT INTO contacts (first_name, phone) VALUES (%s, %s)",
+            (name, phone)
+        )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        print("Error:", e)
+    finally:
+        cur.close()
+        conn.close()
+while True:
+    print("\n1.Insert console")
+    print("2.Insert CSV")
+    print("3.Search name")
+    print("4.Update")
+    print("5.Delete")
+    print("0.Exit")
+
+    choice = input("Choose: ")
+
+    if choice == "1":
+        insert_from_console()
+    elif choice == "2":
+        insert_from_csv()
+    elif choice == "3":
+        name = input("Enter name: ")
+        search_by_name(name)
+    elif choice == "4":
+        name = input("Name: ")
+        phone = input("New phone: ")
+        update_contact(name, phone)
+    elif choice == "5":
+        name = input("Name: ")
+        delete_contact(name)
+    elif choice == "0":
+        break

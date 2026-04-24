@@ -1,49 +1,58 @@
-from connect import conn, cur
+import psycopg2
+from config import load_config
 
-def search(pattern):
-    cur.execute("SELECT * FROM search_phonebook(%s);", (pattern,))
-    for row in cur.fetchall():
-        print(row)
+def run_lab_tasks():
+    # Load connection parameters from config.py
+    params = load_config()
+    
+    try:
+        # Connect to the PostgreSQL database
+        with psycopg2.connect(**params) as conn:
+            with conn.cursor() as cur:
+                
+                # 1. TASK: Insert or Update a user (Upsert)
+                # Matches procedure: upsert_user(p_name, p_phone)
+                #print("--- Task: Upserting 'Ali' ---")
+                #cur.execute("CALL upsert_user(%s, %s)", ("Ali", "1234567890"))
+                
+                
+                # 2. TASK: Bulk Insert with Validation
+                # Added ::text[] casting to avoid the "procedure does not exist" error
+                print("--- Task: Bulk Insert ---")
+                names = ['John', 'Jade', 'Robert']
+                phones = ['87011112233', '87022223344', 'abc'] # '123' should be caught by your SQL logic
+                cur.execute("CALL bulk_insert(%s::text[], %s::text[])", (names, phones))
+                
+                
+                # 3. TASK: Search by pattern (Function)
+                # Matches function: get_contacts_by_pattern(search_pattern)
+                print("--- Task: Searching for pattern ---")
+                cur.execute("SELECT * FROM get_contacts_by_pattern(%s)", ("J",))
+                results = cur.fetchall()
+                for row in results:
+                    print(f"ID: {row[0]} | Name: {row[1]} | Phone: {row[2]}")
+                
+                
+                # 4. TASK: Pagination (Function)
+                # Matches function: get_contacts_paged(p_limit, p_offset)
+                print("\n--- Task: Pagination (Limit 10, Offset 2) ---")
+                cur.execute("SELECT * FROM get_contacts_paged(%s, %s)", (100, 0))
+                page_results = cur.fetchall()
+                for row in page_results:
+                    print(f"ID: {row[0]} | Name: {row[1]} | Phone: {row[2]}")
 
-def paginate(limit, offset):
-    cur.execute("SELECT * FROM get_phonebook_paginated(%s,%s);", (limit, offset))
-    for row in cur.fetchall():
-        print(row)
 
-def insert_or_update(name, surname, phone):
-    cur.execute("CALL insert_or_update_user(%s,%s,%s);", (name, surname, phone))
-    conn.commit()
-    print("User inserted/updated")
+                # 5. TASK: Delete user
+                # Matches procedure: delete_contact(p_search)
+                #print("\n--- Task: Deleting contact 'Bob' ---")
+                #cur.execute("CALL delete_contact(%s)", ("Bob",))
 
-def insert_many(users_list):
-    cur.execute("CALL insert_many_users(%s);", (users_list,))
-    conn.commit()
-    print("Batch insert completed")
+                # Save all changes
+                conn.commit()
+                print("\nLab tasks completed and committed successfully!")
 
-def delete_contact(name, phone):
-    cur.execute("CALL delete_contact_by_name_or_phone(%s,%s);", (name, phone))
-    conn.commit()
-    print("Contact deleted")
-
-def menu():
-    while True:
-        print("\n1.Search\n2.Paginate\n3.Insert/Update\n4.Batch Insert\n5.Delete\n6.Exit")
-        choice = input("Choose option: ")
-        if choice == '1':
-            search(input("Enter pattern: "))
-        elif choice == '2':
-            paginate(int(input("Limit: ")), int(input("Offset: ")))
-        elif choice == '3':
-            insert_or_update(input("Name: "), input("Surname: "), input("Phone: "))
-        elif choice == '4':
-            users = [['Alice','Smith','555-1234'], ['Bob','Jones','abc']]
-            insert_many(users)
-        elif choice == '5':
-            delete_contact(input("Name: "), input("Phone: "))
-        elif choice == '6':
-            break
-        else:
-            print("Invalid option")
+    except Exception as error:
+        print(f"An error occurred: {error}")
 
 if __name__ == "__main__":
-    menu()
+    run_lab_tasks()

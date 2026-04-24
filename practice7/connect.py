@@ -1,16 +1,15 @@
-# connect.py
 import psycopg2
-from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+import config
 
-try:
-    conn = psycopg2.connect(
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT
-    )
-    cur = conn.cursor()
-    print("Connection successful")
-except Exception as e:
-    print("Error connecting to PostgreSQL:", e)
+def connect():
+    try:
+        conn = psycopg2.connect(
+            host=config.host,
+            dbname=config.dbname,
+            user=config.user,
+            password=config.password,
+            port=config.port
+        )
+        return conn
+    except Exception as e:
+        print("Connection error:", e)
